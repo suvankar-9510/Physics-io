@@ -42,18 +42,27 @@ const formulaBlocks: FormulaBlock[] = [
   },
 ];
 
+const paramToBlocksMap = new Map<string, Set<string>>();
+formulaBlocks.forEach(block => {
+  block.relatedParams.forEach(param => {
+    let set = paramToBlocksMap.get(param);
+    if (!set) {
+      set = new Set<string>();
+      paramToBlocksMap.set(param, set);
+    }
+    set.add(block.id);
+  });
+});
+
 export default function TheorySection() {
   const { lastChanged } = useSimulationStore();
   const [highlighted, setHighlighted] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!lastChanged) return;
-    const newHighlights = new Set<string>();
-    formulaBlocks.forEach(block => {
-      if (block.relatedParams.includes(lastChanged)) {
-        newHighlights.add(block.id);
-      }
-    });
+    const highlights = paramToBlocksMap.get(lastChanged);
+    const newHighlights = highlights ? new Set(highlights) : new Set<string>();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHighlighted(newHighlights);
     const timer = setTimeout(() => setHighlighted(new Set()), 2500);
     return () => clearTimeout(timer);

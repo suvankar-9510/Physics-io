@@ -17,7 +17,6 @@ export default function LiveFormula({ formula, displayMode = true, className = '
         katex.render(formula, ref.current, {
           displayMode,
           throwOnError: false,
-          trust: true,
         });
       } catch {
         if (ref.current) ref.current.textContent = formula;

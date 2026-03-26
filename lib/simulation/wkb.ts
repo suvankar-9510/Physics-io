@@ -1,4 +1,4 @@
-export interface WKBPoint {
+interface WKBPoint {
   x: number;
   psi: number;
 }

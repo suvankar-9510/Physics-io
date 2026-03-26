@@ -4,7 +4,7 @@ import { getBranchBySlug, getTopicsByBranch } from '../../lib/topics';
 import Breadcrumb from '../../components/layout/Breadcrumb';
 
 interface PageProps {
-  params: { branch: string };
+  params: Promise<{ branch: string }>;
 }
 
 const levelColors = {
@@ -13,11 +13,12 @@ const levelColors = {
   PhD: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
 };
 
-export default function BranchPage({ params }: PageProps) {
-  const branch = getBranchBySlug(params.branch);
+export default async function BranchPage({ params }: PageProps) {
+  const { branch: branchSlug } = await params;
+  const branch = getBranchBySlug(branchSlug);
   if (!branch) notFound();
 
-  const topics = getTopicsByBranch(params.branch);
+  const topics = getTopicsByBranch(branchSlug);
   const subThemes = [...new Set(topics.map(t => t.subTheme))];
 
   return (
@@ -36,7 +37,7 @@ export default function BranchPage({ params }: PageProps) {
             {topics.filter(t => t.subTheme === theme).map(topic => (
               <Link
                 key={topic.id}
-                href={`/${params.branch}/${topic.id}`}
+                href={`/${branchSlug}/${topic.id}`}
                 className="group bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 hover:border-indigo-400 hover:shadow-lg transition-all"
               >
                 <div className="flex items-start justify-between mb-2">

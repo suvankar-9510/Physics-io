@@ -10,7 +10,7 @@ import TopicConnections from '../../../components/blocks/TopicConnections';
 import ExternalResources from '../../../components/blocks/ExternalResources';
 
 interface PageProps {
-  params: { branch: string; topic: string };
+  params: Promise<{ branch: string; topic: string }>;
 }
 
 const levelColors = {
@@ -19,9 +19,10 @@ const levelColors = {
   PhD: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
 };
 
-export default function TopicPage({ params }: PageProps) {
-  const topic = getTopicById(params.topic);
-  const branch = getBranchBySlug(params.branch);
+export default async function TopicPage({ params }: PageProps) {
+  const { branch: branchSlug, topic: topicSlug } = await params;
+  const topic = getTopicById(topicSlug);
+  const branch = getBranchBySlug(branchSlug);
 
   if (!topic || !branch) notFound();
 
@@ -29,7 +30,7 @@ export default function TopicPage({ params }: PageProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       <Breadcrumb crumbs={[
         { label: 'Home', href: '/' },
-        { label: branch.name, href: `/${params.branch}` },
+        { label: branch.name, href: `/${branchSlug}` },
         { label: topic.name },
       ]} />
 

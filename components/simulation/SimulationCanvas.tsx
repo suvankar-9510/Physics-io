@@ -3,6 +3,18 @@ import { useRef, useEffect } from 'react';
 import { useSimulationStore } from '../../store/simulationStore';
 import { computeWKB } from '../../lib/simulation/wkb';
 
+
+const CANVAS_CONFIG = {
+  padL: 50,
+  padR: 20,
+  padT: 20,
+  padB: 40,
+  xMin: -3,
+  xMax: 3,
+  yMin: -1.5,
+  yMax: 12,
+};
+
 export default function SimulationCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -17,12 +29,9 @@ export default function SimulationCanvas() {
 
     const W = canvas.width;
     const H = canvas.height;
-    const padL = 50, padR = 20, padT = 20, padB = 40;
+    const { padL, padR, padT, padB, xMin, xMax, yMin, yMax } = CANVAS_CONFIG;
     const plotW = W - padL - padR;
     const plotH = H - padT - padB;
-
-    const xMin = -3, xMax = 3;
-    const yMin = -1.5, yMax = 12;
     const barrierStart = -params.barrierWidth / 2;
     const barrierEnd = params.barrierWidth / 2;
 

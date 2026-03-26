@@ -3,6 +3,10 @@ export interface WKBPoint {
   psi: number;
 }
 
+// Scale factors for display purposes: maps physical coordinates to visual frequency
+const SPATIAL_FREQUENCY_SCALE = 3;
+const TEMPORAL_FREQUENCY_SCALE = 2;
+
 export function computeWKB(
   barrierHeight: number,
   particleEnergy: number,
@@ -26,7 +30,7 @@ export function computeWKB(
     if (V < particleEnergy) {
       // Classically allowed: oscillatory
       const k = waveNumber * Math.sqrt(particleEnergy - V);
-      psi = Math.sin(k * x * 3 - time * 2) / Math.sqrt(k || 0.01);
+      psi = Math.sin(k * x * SPATIAL_FREQUENCY_SCALE - time * TEMPORAL_FREQUENCY_SCALE) / Math.sqrt(k || 0.01);
     } else {
       // Classically forbidden: exponential decay
       const kappa = waveNumber * Math.sqrt(Math.max(V - particleEnergy, 0.01));
@@ -34,7 +38,7 @@ export function computeWKB(
         ? Math.max(0, x - barrierStart)
         : Math.max(0, barrierEnd - x);
       const decay = Math.exp(-kappa * distIntoBarrier * 2);
-      const phase = x < 0 ? Math.sin(-barrierStart * waveNumber * 3 - time * 2) : Math.sin(barrierEnd * waveNumber * 3 - time * 2);
+      const phase = x < 0 ? Math.sin(-barrierStart * waveNumber * SPATIAL_FREQUENCY_SCALE - time * TEMPORAL_FREQUENCY_SCALE) : Math.sin(barrierEnd * waveNumber * SPATIAL_FREQUENCY_SCALE - time * TEMPORAL_FREQUENCY_SCALE);
       psi = decay * phase;
     }
 

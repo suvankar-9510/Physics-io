@@ -19,7 +19,15 @@ export default async function BranchPage({ params }: PageProps) {
   if (!branch) notFound();
 
   const topics = getTopicsByBranch(branchSlug);
-  const subThemes = [...new Set(topics.map(t => t.subTheme))];
+
+  // Group topics by subTheme in a single pass O(N) to avoid O(N*M) nested loops
+  const topicsBySubTheme = topics.reduce((acc, topic) => {
+    if (!acc[topic.subTheme]) {
+      acc[topic.subTheme] = [];
+    }
+    acc[topic.subTheme].push(topic);
+    return acc;
+  }, {} as Record<string, typeof topics>);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -30,11 +38,11 @@ export default async function BranchPage({ params }: PageProps) {
         <p className="text-slate-500 dark:text-slate-400 max-w-2xl">{branch.description}</p>
       </div>
 
-      {subThemes.map(theme => (
+      {Object.entries(topicsBySubTheme).map(([theme, themeTopics]) => (
         <div key={theme} className="mb-10">
           <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">{theme}</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {topics.filter(t => t.subTheme === theme).map(topic => (
+            {themeTopics.map(topic => (
               <Link
                 key={topic.id}
                 href={`/${branchSlug}/${topic.id}`}
